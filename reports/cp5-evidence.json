@@ -1,0 +1,17 @@
+{
+  "query": "Tổng hợp các ticket còn mở tuần này",
+  "principal": "dpo",
+  "mock": true,
+  "ledger_first_line": 160,
+  "ledger_last_line": 183,
+  "ledger_verify": true,
+  "attack_after_bytes": 0,
+  "attack_before_sha256": "d97af1b21f949b58769d2259649885c9e1142afad18f5d446fe0f13359a54dac",
+  "read_customer_allow_count": 22,
+  "http_post_deny_lines": [
+    183
+  ],
+  "history_findings": 1,
+  "current_findings": 0,
+  "pre_commit_exit": 0
+}
