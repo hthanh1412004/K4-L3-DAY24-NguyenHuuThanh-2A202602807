@@ -60,6 +60,13 @@ Interface bắt buộc (agent/loop.py import và gọi hàm này nếu tồn t�
 from __future__ import annotations
 
 from pathlib import Path
+from datetime import datetime, timedelta, timezone
+import hashlib
+import json
+import re
+from uuid import uuid4
+
+from agent import ledger, pii, policy, tools
 
 REPORTS_DIR = Path(__file__).resolve().parent.parent / "reports"
 DEFAULT_LEDGER_PATH = REPORTS_DIR / "ledger.jsonl"
@@ -71,4 +78,66 @@ class RunnerScaffoldPending(NotImplementedError):
 
 def handle(message: str, llm, log_dir: Path | None = None,
            principal_id: str = "support_l1") -> str:
-    raise RunnerScaffoldPending("BƯỚC 3c: implement trifecta split")
+    ledger_path = Path(log_dir or REPORTS_DIR) / "ledger.jsonl"
+    request_id = uuid4().hex
+    expires_at = (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat()
+
+    def authorize(tool, args, classification, run, scopes, purpose, egress=False):
+        agent_id = f"lab24-{run}-{request_id}"
+        context = policy.PolicyContext(
+            classification, purpose, agent_id, 0, egress,
+            principal_id=principal_id, requested_tool=tool,
+            agent_scopes=scopes, expires_at=expires_at,
+        )
+        allow, reason = policy.check(context)
+        ledger.append({
+            "ts": datetime.now(timezone.utc).isoformat(),
+            "agent_id": agent_id, "run_id": f"{request_id}/{run}",
+            "on_behalf_of": principal_id, "expires_at": expires_at,
+            "tool": tool, "args_hash": hashlib.sha256(
+                json.dumps(args, sort_keys=True, ensure_ascii=False).encode("utf-8")
+            ).hexdigest(),
+            "classification": classification,
+            "decision": "allow" if allow else "deny", "reason": reason,
+        }, ledger_path)
+        return allow
+
+    # Run A alone sees untrusted text; it has no private-data or network scope.
+    if not authorize("search_docs", {"query": message}, "internal", "run-a",
+                     ("search_docs",), "summarize-tickets"):
+        return "Yêu cầu tìm ticket bị từ chối bởi policy."
+    docs = tools.search_docs(message)
+    safe_docs = [{"id": doc["id"], "text": pii.redact(doc["text"])} for doc in docs]
+    injected = llm.find_injection("\n\n".join(doc["text"] for doc in safe_docs))
+    ticket_ids = sorted({int(match.group(1)) for doc in docs
+                         if (match := re.fullmatch(r"ticket-(\d+)(?:b)?\.md", doc["id"]))})
+    summary = llm.summarize(safe_docs)
+
+    # Only typed file-derived ticket IDs cross into the private-data run.
+    _run_b(ticket_ids, authorize)
+
+    # Separate PEP probe carries only the target URL, never customer records.
+    if injected is not None:
+        allowed = authorize("http_post", {"url": injected.target_url}, "restricted",
+                            "egress-probe", ("http_post",), "support-reply", egress=True)
+        if allowed:
+            tools.http_post(injected.target_url, {})
+    return summary
+
+
+def _run_b(ticket_ids: list[int], authorize) -> None:
+    scopes = ("read_customer",)
+    # Authorize access before opening the mapping, which shares the private store.
+    if not authorize("read_customer", {"ticket_ids": ticket_ids, "stage": "mapping"},
+                     "restricted", "run-b", scopes, "support-reply"):
+        return
+    customers = json.loads(tools.CUSTOMERS_FILE.read_text(encoding="utf-8"))
+    wanted = set(ticket_ids)
+    customer_ids = [record["customer_id"] for record in customers
+                    if wanted.intersection(record.get("related_tickets", []))]
+    del customers
+    for customer_id in customer_ids:
+        if authorize("read_customer", {"customer_id": customer_id}, "restricted",
+                     "run-b", scopes, "support-reply"):
+            # Private records stay in Run B and are never passed back to the LLM.
+            tools.read_customer(customer_id)
