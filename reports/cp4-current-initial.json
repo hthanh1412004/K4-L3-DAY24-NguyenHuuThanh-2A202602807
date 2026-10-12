@@ -1,0 +1,22 @@
+[
+ {
+  "RuleID": "generic-api-key",
+  "Description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations.",
+  "StartLine": 45,
+  "EndLine": 45,
+  "StartColumn": 10,
+  "EndColumn": 41,
+  "Match": "RegEnumKey = REDACTED",
+  "Secret": "REDACTED",
+  "File": ".venv/Lib/site-packages/setuptools/_distutils/msvccompiler.py",
+  "SymlinkFile": "",
+  "Commit": "",
+  "Entropy": 3.932138,
+  "Author": "",
+  "Email": "",
+  "Date": "",
+  "Message": "",
+  "Tags": [],
+  "Fingerprint": ".venv/Lib/site-packages/setuptools/_distutils/msvccompiler.py:generic-api-key:45"
+ }
+]

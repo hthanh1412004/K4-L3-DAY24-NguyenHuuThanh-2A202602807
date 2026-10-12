@@ -1,0 +1,27 @@
+{
+  "gitleaks_version": "8.30.1",
+  "history_findings": 1,
+  "current_findings": 0,
+  "exit_codes": {
+    "history": 1,
+    "current": 0,
+    "pre-commit": 0
+  },
+  "locked_packages": {
+    "certifi": "2026.7.22",
+    "charset-normalizer": "3.5.2",
+    "colorama": "0.4.6",
+    "idna": "3.20",
+    "iniconfig": "2.3.1",
+    "packaging": "26.3",
+    "pluggy": "1.6.0",
+    "pygments": "2.21.0",
+    "pytest": "9.1.1",
+    "requests": "2.34.2",
+    "urllib3": "2.8.0"
+  },
+  "force_reinstall_require_hashes_exit": 0,
+  "tests_passed": 34,
+  "tests_command": ".venv/Scripts/python.exe -X utf8 -m pytest tests/ -q -s",
+  "ledger_verify_after_tests": true
+}

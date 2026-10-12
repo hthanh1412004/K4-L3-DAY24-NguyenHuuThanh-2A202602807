@@ -1,0 +1,3 @@
+# Verified false positive: setuptools aliases the win32api.RegEnumKey function.
+# Ignore only this finding in the local virtual environment, not source files.
+.venv/Lib/site-packages/setuptools/_distutils/msvccompiler.py:generic-api-key:45

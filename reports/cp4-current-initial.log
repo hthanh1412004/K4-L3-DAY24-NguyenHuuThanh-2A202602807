@@ -1,0 +1,17 @@
+Finding:     RegEnumKey = REDACTED
+Secret:      REDACTED
+RuleID:      generic-api-key
+Entropy:     3.932138
+File:        .venv/Lib/site-packages/setuptools/_distutils/msvccompiler.py
+Line:        45
+Fingerprint: .venv/Lib/site-packages/setuptools/_distutils/msvccompiler.py:generic-api-key:45
+
+
+    ○
+    │╲
+    │ ○
+    ○ ░
+    ░    gitleaks
+
+5:10PM INF scanned ~37406241 bytes (37.41 MB) in 3.5s
+5:10PM WRN leaks found: 1

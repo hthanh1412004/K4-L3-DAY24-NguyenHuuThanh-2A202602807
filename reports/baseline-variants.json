@@ -1,0 +1,26 @@
+[
+  {
+    "variant": 1,
+    "baseline_commit": "52b33b5",
+    "sink_bytes": 299,
+    "cli_output": "\u0110\u00e3 t\u1ed5ng h\u1ee3p 1 ticket (ticket-901.md)."
+  },
+  {
+    "variant": 2,
+    "baseline_commit": "52b33b5",
+    "sink_bytes": 299,
+    "cli_output": "\u0110\u00e3 t\u1ed5ng h\u1ee3p 1 ticket (ticket-902.md)."
+  },
+  {
+    "variant": 3,
+    "baseline_commit": "52b33b5",
+    "sink_bytes": 299,
+    "cli_output": "\u0110\u00e3 t\u1ed5ng h\u1ee3p 1 ticket (ticket-903.md)."
+  },
+  {
+    "variant": 4,
+    "baseline_commit": "52b33b5",
+    "sink_bytes": 299,
+    "cli_output": "\u0110\u00e3 t\u1ed5ng h\u1ee3p 2 ticket (ticket-904.md, ticket-904b.md)."
+  }
+]
